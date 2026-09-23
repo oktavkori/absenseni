@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Selamat Ulang Tahun</title>
+  <!-- SweetAlert2 CSS & JS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #0d1b2a;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 20px 20px;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    /* Step 1: Amplop & Tombol Buka */
+    .envelope-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .envelope {
+      width: 150px;
+      height: 100px;
+      background: #ffb7c5;
+      border-radius: 10px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 15px rgba(255, 183, 197, 0.5);
+    }
+
+    .envelope::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      border-left: 75px solid transparent;
+      border-right: 75px solid transparent;
+      border-top: 50px solid #ff85a2;
+    }
+
+    .btn-pink {
+      background-color: #e63946;
+      color: white;
+      border: 2px solid white;
+      padding: 10px 25px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+
+    .btn-pink:hover {
+      transform: scale(1.05);
+    }
+
+    /* Step 2: Slider Tahun Lahir */
+    .card-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 25px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .year-val {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ff85a2;
+    }
+
+    /* Step 3: Game Memori */
+    .memory-game {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .grid-memory {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .card {
+      width: 70px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .card.flipped {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Custom Styling SweetAlert */
+    .swal-custom-popup {
+      background: rgba(20, 30, 45, 0.95) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 20px !important;
+      color: #fff !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Tampilan 1: Buka Pesan -->
+    <div id="step1" class="envelope-box">
+      <div class="envelope">
+        <span style="font-size: 30px;">✉️</span>
+      </div>
+      <button class="btn-pink" onclick="startFlow()">Buka</button>
+    </div>
+
+    <!-- Tampilan 2: Tahun Lahir -->
+    <div id="step2" class="card-box">
+      <div class="avatar">🐼</div>
+      <h3>Tahun Lahir Kamu? 🤔</h3>
+      <input type="range" id="yearRange" min="1995" max="2015" value="2000" oninput="updateYear(this.value)">
+      <div class="year-val" id="yearDisplay">2000</div>
+      <button class="btn-pink" onclick="submitYear()">Lanjutkan</button>
+    </div>
+
+    <!-- Tampilan 3: Game Memori -->
+    <div id="step3" class="card-box memory-game">
+      <h3>Memory Game 🎮</h3>
+      <p style="font-size: 0.9rem;">Cocokkan kartu² ini yaa! 🥰</p>
+      <div class="grid-memory" id="gridMemory">
+        <!-- Kartu diisi oleh JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let birthYear = 2000;
+    const currentYear = new Date().getFullYear();
+
+    function startFlow() {
+      // Menampilkan popup "Hallo Kamu! 💖🌸" saat amplop dibuka
+      Swal.fire({
+        title: 'Hallo Kamu! 💖🌸',
+        background: '#ffb7c5',
+        color: '#000',
+        showConfirmButton: false,
+        timer: 1500
+      }).then(() => {
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'flex';
+      });
+    }
+
+    function updateYear(val) {
+      document.getElementById('yearDisplay').innerText = val;
+      birthYear = parseInt(val);
+    }
+
+    function submitYear() {
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'flex';
+      initGame();
+    }
+
+    // Logika Game Memori Sederhana
+    const items = ['🎉', '💖', '🌹', '🎉', '💖', '🌹'];
+    let flippedCards = [];
+    let matchedPairs = 0;
+
+    function initGame() {
+      const grid = document.getElementById('gridMemory');
+      grid.innerHTML = '';
+      // Acak urutan kartu
+      const shuffled = items.sort(() => 0.5 - Math.random());
+
+      shuffled.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.value = item;
+        card.dataset.index = index;
+        card.onclick = () => flipCard(card);
+        grid.appendChild(card);
+      });
+    }
+
+    function flipCard(card) {
+      if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+        card.classList.add('flipped');
+        card.innerText = card.dataset.value;
+        flippedCards.push(card);
+
+        if (flippedCards.length === 2) {
+          checkMatch();
+        }
+      }
+    }
+
+    function checkMatch() {
+      const [card1, card2] = flippedCards;
+      if (card1.dataset.value === card2.dataset.value) {
+        matchedPairs++;
+        flippedCards = [];
+        if (matchedPairs === items.length / 2) {
+          setTimeout(showFinalWish, 800);
+        }
+      } else {
+        setTimeout(() => {
+          card1.classList.remove('flipped');
+          card2.classList.remove('flipped');
+          card1.innerText = '';
+          card2.innerText = '';
+          flippedCards = [];
+        }, 800);
+      }
+    }
+
+    // Tampilan Ucapan Ulang Tahun Akhir
+    function showFinalWish() {
+      document.getElementById('step3').style.display = 'none';
+      const age = currentYear - birthYear;
+
+      let message = `
+        <div style="font-size: 50px; margin-bottom: 10px;">🐼🎉</div>
+        <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Selamat Ulang Tahun ke-${age}! 🎁🎉</h2>
+        <p style="font-size: 0.95rem; line-height: 1.5; text-align: center; color: #ddd;">
+          Happy Birthday, yaa! 🥳 Ciyee.. Ada yang bertambah usianya nih 🤪😁<br><br>
+          Semoga di usia baru ini, kamu selalu dikelilingi kebahagiaan, kesehatan, dan semoga segala doa serta cita-cita kamu bisa terwujud 🤲🥰<br><br>
+          Dan semoga hari ini menjadi awal dari tahun yang penuh keberkahan dan kebahagiaan untukmu yaa 🥳<br><br>
+          <b>Wish you all the best! 🎊🥳</b>
+        </p>
+      `;
+
+      Swal.fire({
+        html: message,
+        customClass: {
+          popup: 'swal-custom-popup'
+        },
+        showConfirmButton: true,
+        confirmButtonText: 'Terima Kasih! ❤️',
+        confirmButtonColor: '#e63946'
+      });
+    }
+  </script>
