@@ -1,0 +1,6 @@
+body { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  .absen-btn:disabled .btn-text { display: none; }
+  .absen-btn:disabled .btn-loader { display: inline-flex !important; }
